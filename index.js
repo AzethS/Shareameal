@@ -6,6 +6,12 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
+// Middleware tracer for logging function calls
+app.use((req, res, next) => {
+  console.log(`Function ${req.path} called with parameters:`, req.body);
+  next();
+});
+
 // UC-201: Register as new user
 app.post("/api/users", (req, res) => {
   const { username, password, email } = req.body;
@@ -24,24 +30,34 @@ app.post("/api/users", (req, res) => {
   // Create new user
   const newUser = { username, password, email };
   User.save(newUser)
-    .then((user) => res.status(201).json(user))
-    .catch((error) =>
-      res.status(500).json({ error: "Internal server error" })
-    );
+    .then((user) => {
+      console.log(`Function ${req.path} returned:`, user);
+      res.status(201).json(user);
+    })
+    .catch((error) => {
+      console.error(error.stack);
+      res.status(500).json({ error: "Internal server error" });
+    });
 });
 
 // UC-202: Request overview of users
 app.get("/api/users", (req, res) => {
   User.getAll()
-    .then((users) => res.json(users))
-    .catch((error) =>
-      res.status(500).json({ error: "Internal server error" })
-    );
+    .then((users) => {
+      console.log(`Function ${req.path} returned:`, users);
+      res.json(users);
+    })
+    .catch((error) => {
+      console.error(error.stack);
+      res.status(500).json({ error: "Internal server error" });
+    });
 });
 
 // UC-203: Query own user profile
 app.get("/api/users/me", (req, res) => {
-  res.json(User.find(req.user.username));
+  const user = User.find(req.user.username);
+  console.log(`Function ${req.path} returned:`, user);
+  res.json(user);
 });
 
 // UC-204: Request user data with ID
@@ -49,8 +65,10 @@ app.get("/api/users/:id", (req, res) => {
   const { id } = req.params;
   const user = User.findById(parseInt(id));
   if (!user) {
+    console.log(`Function ${req.path} returned: User not found`);
     return res.status(404).json({ error: "User not found" });
   }
+  console.log(`Function ${req.path} returned:`, user);
   res.json(user);
 });
 
@@ -69,19 +87,28 @@ app.patch("/api/users/me", (req, res) => {
   if (password) user.password = password;
   if (email) user.email = email;
   User.update(user)
-    .then((updatedUser) => res.json(updatedUser))
-    .catch((error) =>
-      res.status(500).json({ error: "Internal server error" })
-    );
+    .then((updatedUser) => {
+      console.log(`Function ${req.path} returned:`, updatedUser);
+      res.json(updatedUser);
+    })
+    .catch((error) => {
+      console.error(error.stack);
+      res.status(500).json({ error: "Internal server error" });
+    });
 });
 
 // UC-206: Delete own user profile
 app.delete("/api/users/me", (req, res) => {
-  User.delete(req.user.username)
-    .then(() => res.status(204).end())
-    .catch((error) =>
-      res.status(500).json({ error: "Internal server error" })
-    );
+  const username = req.user.username;
+  User.delete(username)
+    .then(() => {
+      console.log(`Function ${req.path} returned: User with username ${username} deleted`);
+      res.json({ message: "User deleted successfully" });
+    })
+    .catch((error) => {
+      console.error(error.stack);
+      res.status(500).json({ error: "Internal server error" });
+    });
 });
 
 // Error handling middleware
