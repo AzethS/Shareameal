@@ -9,8 +9,8 @@ function getInfo(req, res) {
         naam: "Fairys Ardhana",
         studentnummer: "2175412",
         opleiding: "IT",
-        bescrhijving: "Een project van shareameal",
-        SonarQube: "https://sonarqube.avans-informatica-breda.nl/dashboard?id=NodeJs-Server",
+        bescrhijving: "Een project van sameneten (shareameal)",
+        
     }
     res.send(student)
 }
