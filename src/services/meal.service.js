@@ -1,5 +1,5 @@
 const database = require("./database.service")
-const home = require("../services/home.service")
+const home = require("./home.service")
 const logger = require("../helpers/log")
 
 class Meal {
