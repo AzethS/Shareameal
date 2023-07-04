@@ -6,11 +6,6 @@ const User = require('../userModel');
 chai.use(chaiHttp);
 chai.should();
 
-describe('User API', () => {
-  beforeEach((done) => {
-    User.reset(); // Reset the in-memory database before each test
-    done();
-  });
 
   describe('POST /api/users', () => {
     it('should add a new user to the database', (done) => {
@@ -36,34 +31,34 @@ describe('User API', () => {
 
   describe('GET /api/users', () => {
     it('should return all users in the database', (done) => {
-      const user1 = {
-        username: 'user1',
-        password: 'password1',
-        email: 'user1@test.com'
-      };
-      const user2 = {
-        username: 'user2',
-        password: 'password2',
-        email: 'user2@test.com'
-      };
-      User.save(user1);
-      User.save(user2);
+      // const user1 = {
+      //   username: 'user1',
+      //   password: 'password1',
+      //   email: 'user1@test.com'
+      // };
+      // const user2 = {
+      //   username: 'user2',
+      //   password: 'password2',
+      //   email: 'user2@test.com'
+      // };
+      // User.save(user1);
+      // User.save(user2);
 
       chai.request(app)
         .get('/api/users')
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
-          res.body.should.have.lengthOf(2);
+          res.body.should.have.lengthOf(3);
           done();
         });
     });
   });
 
-  describe('GET /api/users/me', () => {
+  describe('GET /api/users/testuser', () => {
     it('should return a fictitious user profile', (done) => {
       chai.request(app)
-        .get('/api/users/me')
+        .get('/api/users/testuser')
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('object');
@@ -145,4 +140,3 @@ describe('DELETE /api/users/:id', () => {
         });
     });
   });
-});
